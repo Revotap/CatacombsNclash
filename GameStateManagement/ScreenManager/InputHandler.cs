@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameStateManagement.Class
+namespace CatacombsNClash.ScreenManager
 {
-    internal class Controller
+    internal class InputHandler
     {
         #region Variables
         private KeyboardState currentKeyboardState;
@@ -15,7 +15,7 @@ namespace GameStateManagement.Class
         #endregion
 
         #region Constructor
-        public Controller()
+        public InputHandler()
         {
             currentKeyboardState = Keyboard.GetState();
             previousKeyboardState = currentKeyboardState;
@@ -26,8 +26,8 @@ namespace GameStateManagement.Class
 
         public bool IsNewKeyPressed(Keys key)
         {
-               return currentKeyboardState.IsKeyDown(key) &&
-                        !previousKeyboardState.IsKeyDown(key);      
+            return currentKeyboardState.IsKeyDown(key) &&
+                     !previousKeyboardState.IsKeyDown(key);
         }
 
         #endregion
@@ -48,7 +48,7 @@ namespace GameStateManagement.Class
         {
             return this.previousKeyboardState;
         }
-        
+
         public void setPreviousKeyboardState(KeyboardState previousKeyboardState)
         {
             this.previousKeyboardState = previousKeyboardState;

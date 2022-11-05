@@ -1,3 +1,4 @@
+using CatacombsNClash.Class;
 using GameStateManagement.Class;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -11,158 +12,41 @@ using System.Threading.Tasks;
 
 namespace GameStateManagement.Class
 {
-    internal class Enemy
+    public class Enemy : Character
     {
         #region Variables
-        private Texture2D EnemyTexture;
-        private readonly List<Vector2> enemyPositions = new List<Vector2>();
+        private Item loot;
+        private int exp;
+        #endregion
 
-        private Vector2 enemyStartPosition = new Vector2(100, 100);
-        private float enemyRadius;
-        private float enemySpeed = 1f;
-        private Color enemyColor;
-        private SoundEffect explosionSound;
-        private static Random random = new Random();
+        #region Properties
+        public Item Loot { get => loot;}
+        public int Exp { get => exp;}
         #endregion
 
         #region Constructor
-        public Enemy(Texture2D EnemyTexture, SoundEffect explosionSound)
+        public Enemy()
         {
-            this.EnemyTexture = EnemyTexture;
-            this.explosionSound = explosionSound;
+            
             
         }
         #endregion
 
-        #region Sound
-        public void PlayExplosionSound()
-        {
-            explosionSound.Play();
-        }
-
-        #endregion
+        
 
         #region Methods
-
-        // Radius
-        public void calcRadius()
+        public Item dropItem()
         {
-            if (EnemyTexture != null)
-            {
-                if (EnemyTexture.Width > EnemyTexture.Height)
-                {
-                    enemyRadius = EnemyTexture.Width;
-                }
-                else
-                {
-                    enemyRadius = EnemyTexture.Height;
-                }
-
-                // Gegner erzeugen
-                CreateEnemies();
-            }
-
+            return Loot;
         }
 
-        public void CreateEnemies()
+        public int ExpGrant()
         {
-            // Feinde erzeugen
-            Vector2 position = enemyStartPosition;
-            position.X -= EnemyTexture.Width / 2;
-
-            // Eine Zufallszahl zwischen 3 und 10 ermitteln
-            int count = random.Next(3, 11);
-
-            // Gegener erzeugen
-            for (int i = 0; i < count; i++)
-            {
-                enemyPositions.Add(position);
-                position.X += EnemyTexture.Width + 15f;
-            }
-            // Farbwert ändern
-            switch (count)
-            {
-                case 3:
-                    enemyColor = Color.Red;
-                    break;
-                case 4:
-                    enemyColor = Color.Green;
-                    break;
-                case 5:
-                    enemyColor = Color.Yellow;
-                    break;
-                case 6:
-                    enemyColor = Color.Blue;
-                    break;
-                case 7:
-                    enemyColor = Color.Magenta;
-                    break;
-                case 8:
-                    enemyColor = Color.Yellow;
-                    break;
-                case 9:
-                    enemyColor = Color.White;
-                    break;
-                case 10:
-                    enemyColor = Color.DarkGreen;
-                    break;
-                default:
-                    break;
-            }
+            return Exp;
         }
 
-        public void UpdateEnemies()
-        {
-            // Startposition verändern
-            enemyStartPosition.X += enemySpeed;
-
-            // Bewegungsrichtung umkehren
-            if (enemyStartPosition.X > 250)
-            {
-                enemySpeed *= -1;
-            }
-            else if (enemyStartPosition.X < 100f)
-            {
-                enemySpeed *= -1;
-            }
-
-            // Alle Feinde abgeschossen? Dann Neue Gegener
-            if (enemyPositions.Count == 0 && EnemyTexture != null)
-            {
-                CreateEnemies();
-            }
-
-            // Aktualisieren
-            for (int i = 0; i < enemyPositions.Count; i++)
-            {
-                Vector2 position = enemyPositions[i];
-                position.X += enemySpeed;
-                enemyPositions[i] = position;
-            }
-        }
         #endregion
 
-        #region GetterSetter
-        public Texture2D getEnemyTexture()
-        {
-            return EnemyTexture;
-        }
-
-        public List<Vector2> getEnemyPositions()
-        {
-            return enemyPositions;
-        }
-
-       public float getEnemyRadius()
-        {
-            return enemyRadius;
-        }
-
-        public Color getEnemyColor()
-        {
-            return enemyColor;
-        }
-        #endregion
     }
 
 
