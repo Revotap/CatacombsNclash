@@ -46,7 +46,8 @@ namespace GameStateManagement.Screens
 
             if(player == null)
             {
-                player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight\knight_f_idle_anim_f0"));
+                //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight\knight_f_idle_anim_f0"));
+                player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight2\Protect"));
             }
 
             _spriteBatch = new SpriteBatch(ScreenManager.GraphicsDevice);
@@ -141,8 +142,8 @@ namespace GameStateManagement.Screens
 
         private void DrawPlayer()
         {
-            //_spriteBatch.Draw(player.Texture, player.PlayerPosition, Color.White);
-            _spriteBatch.Draw(player.Texture, new Rectangle((int)player.PlayerPositionX, (int)player.PlayerPositionY, 64,112), Color.White);
+            _spriteBatch.Draw(player.Texture, player.PlayerPosition, Color.White);
+            //_spriteBatch.Draw(player.Texture, new Rectangle((int)player.PlayerPositionX, (int)player.PlayerPositionY, 64,112), Color.White);
         }
 
         private void DrawOverlay()
