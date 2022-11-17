@@ -54,6 +54,8 @@ namespace GameStateManagement.Class
         protected int HealthPoints { get => healthPoints; set => healthPoints = value; }
         protected int ManaPoints { get => manaPoints; set => manaPoints = value; }
         protected Rectangle BoundingBox { get => boundingBox; set => boundingBox = value; }
+        protected int BoundingBoxX { get => boundingBox.X; set => boundingBox.X = value; }
+        protected int BoundingBoxY { get => boundingBox.Y; set => boundingBox.Y = value; }
         protected float Speed { get => speed; set => speed = value; }
         protected Texture2D Texture { get => texture; set => texture = value; }
         public Vector2 PlayerPosition { get => playerPosition; set => playerPosition = value; }

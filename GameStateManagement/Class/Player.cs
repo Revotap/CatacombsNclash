@@ -12,11 +12,12 @@ namespace GameStateManagement.Class
     internal class Player : Character
     {
         #region Variables
-
+        int width;
+        int height;
         #endregion
 
         #region Construktor
-        public Player(String name, Texture2D playerTexture)
+        public Player(String name, Texture2D playerTexture, int width, int height)
         {
             base.Name = name;
             base.Texture = playerTexture;
@@ -32,8 +33,12 @@ namespace GameStateManagement.Class
             base.ArmorClass = 1;
             base.HealthPoints = 100;
             base.ManaPoints = 100;
-            //base.BoundingBox = null;
+            //base.BoundingBox = new Rectangle();
             base.Speed = 4f;
+
+            this.width = width;
+            this.height = height;
+            base.BoundingBox = new Rectangle((int)base.PlayerPositionX + (width/2),(int) base.PlayerPositionY + (height/3*2), width, height);
         }
         #endregion
 
@@ -67,9 +72,16 @@ namespace GameStateManagement.Class
             }
         }
 
+        public void Update(GameTime gameTime)
+        {
+            base.BoundingBoxX = (int) base.PlayerPositionX;
+            base.BoundingBoxY = (int) base.PlayerPositionY; 
+        }
+
         //Getter and Setter
         public new Texture2D Texture { get => base.Texture; set => base.Texture = value; }
         public new Vector2 PlayerPosition { get => base.PlayerPosition; set => base.PlayerPosition = value; }
         #endregion
+        public new Rectangle BoundingBox { get => base.BoundingBox; }
     }
 }
