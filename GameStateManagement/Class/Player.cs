@@ -12,15 +12,22 @@ namespace GameStateManagement.Class
     internal class Player : Character
     {
         #region Variables
-        int width;
-        int height;
+        private int width;
+        private int height;
+
+        private List<Texture2D> textureList;
+        private int nextTexture = 1;
+        private int timeSinceLastFrame = 0;
+        private int millisecondsPerFrame = 150;
         #endregion
 
         #region Construktor
-        public Player(String name, Texture2D playerTexture, int width, int height)
+        public Player(String name, List<Texture2D> playerTexture, int width, int height)
         {
             base.Name = name;
-            base.Texture = playerTexture;
+            //base.Texture = playerTexture;
+            textureList = playerTexture;
+            base.Texture = textureList.FirstOrDefault();
 
             //Debugging
             base.T_class = "Knight";
@@ -75,7 +82,22 @@ namespace GameStateManagement.Class
         public void Update(GameTime gameTime)
         {
             base.BoundingBoxX = (int) base.PlayerPositionX;
-            base.BoundingBoxY = (int) base.PlayerPositionY; 
+            base.BoundingBoxY = (int) base.PlayerPositionY;
+
+            //Update der Animation
+            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastFrame > millisecondsPerFrame)
+            {
+                timeSinceLastFrame -= millisecondsPerFrame;
+                base.Texture = textureList.ElementAt(nextTexture);
+                nextTexture++;
+                if (nextTexture >= textureList.Count)
+                {
+                    nextTexture = 0;
+                }
+            }
+            
+
         }
 
         //Getter and Setter

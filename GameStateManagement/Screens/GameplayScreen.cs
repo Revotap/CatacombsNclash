@@ -42,7 +42,7 @@ namespace GameStateManagement.Screens
                                                 {"wl","g","g","g","g","g","g","wr"},
                                                 {"wl","g","g","g","g","g","g","wr"},
                                                 {"wl","g","g","g","g","g","g","wr"},
-                                                {"wl","g","g","g","g","g","g","wr"},
+                                                {"wl","g","wb","g","g","wb","g","wr"},
                                                 {"wl","g","g","g","g","g","g","wr"},
                                                 {"cl","wb","wb","wb","wb","wb","wb","cr"}};
 
@@ -76,7 +76,12 @@ namespace GameStateManagement.Screens
             {
                 //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight\knight_f_idle_anim_f0"));
                 //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight2\Protect"));
-                player = new Player("Spieler", Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f0"),64,112);
+                List<Texture2D> playerTextures = new List<Texture2D>();
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f0"));
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f1"));
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f2"));
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f3"));
+                player = new Player("Spieler", playerTextures,64,112);
             }
 
             _spriteBatch = new SpriteBatch(ScreenManager.GraphicsDevice);
