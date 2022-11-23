@@ -1,37 +1,35 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CatacombsNClash.Class
+namespace GameStateManagement.Class
 {
-    public abstract class Character
+    internal abstract class Character
     {
         #region Variables
-        private string name;
-        private string klasse; // class 
-        //Attribute
+        private String name;
+        private String t_class;
         private int strength;
-        private int dexterity;
         private int intelligence;
-        private int armouryClass;
-        private int constitution;
-        //Modfikitaoren
-        private int strMod;
-        private int dexMod;
-        private int intMod;
-        private int conMod;
-   
+        private int dexterity;
+        private int strengthMod;
+        private int intelligenceMod;
+        private int dexterityMod;
+        private int armorClass;
         private int healthPoints;
         private int manaPoints;
-
-        private List<Item> inventory;
-        private Weapon equippedWeapon;
+        //Placeholder for inventory
+        //placeholder for weapon
         private Rectangle boundingBox;
 
-        #endregion
+        //Not in UML
+        private float speed;
+        private Texture2D texture;
+        private Vector2 playerPosition;
 
         #region Properties
         public string Name { get => name; set => name = value; }
@@ -58,47 +56,33 @@ namespace CatacombsNClash.Class
         #endregion
 
         #region Methods
-        public void update()
-        {
+        //public abstract void update();
+        public abstract void moveUp();
+        public abstract void moveDown();
+        public abstract void moveLeft();
+        public abstract void moveRight();
+        //public abstract void attack(int modifier)
 
-        }
-
-        public void move(int x, int y)
-        {
-
-        }
-
-        public void attack(int modifyer) 
-        {
-
-        }
-
-
-        public void defend()
-        {
-
-        }
-
-        public int calcModifyer(int stat)
-        {
-            return stat;
-        }
-
-        public Item useItem(Item item)
-        {
-            return item;
-        }
-        
-        public void addInventory(Item item)
-        {
-
-        }
-
-        public bool intersect()
-        {
-            return true;
-        }
-
+        //Getters and Setters
+        protected string Name { get => name; set => name = value; }
+        protected string T_class { get => t_class; set => t_class = value; }
+        protected int Strength { get => strength; set => strength = value; }
+        protected int Intelligence { get => intelligence; set => intelligence = value; }
+        protected int Dexterity { get => dexterity; set => dexterity = value; }
+        protected int StrengthMod { get => strengthMod; set => strengthMod = value; }
+        protected int IntelligenceMod { get => intelligenceMod; set => intelligenceMod = value; }
+        protected int DexterityMod { get => dexterityMod; set => dexterityMod = value; }
+        protected int ArmorClass { get => armorClass; set => armorClass = value; }
+        protected int HealthPoints { get => healthPoints; set => healthPoints = value; }
+        protected int ManaPoints { get => manaPoints; set => manaPoints = value; }
+        protected Rectangle BoundingBox { get => boundingBox; set => boundingBox = value; }
+        protected int BoundingBoxX { get => boundingBox.X; set => boundingBox.X = value; }
+        protected int BoundingBoxY { get => boundingBox.Y; set => boundingBox.Y = value; }
+        protected float Speed { get => speed; set => speed = value; }
+        protected Texture2D Texture { get => texture; set => texture = value; }
+        public Vector2 PlayerPosition { get => playerPosition; set => playerPosition = value; }
+        public float PlayerPositionX { get => playerPosition.X; set => playerPosition.X = value; }
+        public float PlayerPositionY { get => playerPosition.Y; set => playerPosition.Y = value; }
         #endregion
 
     }

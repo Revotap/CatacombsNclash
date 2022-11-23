@@ -1,6 +1,5 @@
 ﻿using CatacombsNClash.Class;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -11,49 +10,101 @@ using System.Threading.Tasks;
 
 namespace GameStateManagement.Class
 {
-    public class Player : Character
+    internal class Player : Character
     {
         #region Variables
+        private int width;
+        private int height;
 
-        private int currentExp;
-        private int maxExp;
-        private int unspendSkillpoint;
-        // private Shield offHand;
-
+        private List<Texture2D> textureList;
+        private int nextTexture = 1;
+        private int timeSinceLastFrame = 0;
+        private int millisecondsPerFrame = 150;
         #endregion
 
-        #region Properties
-        public int CurrentExp { get => currentExp; set => currentExp = value; }
-        public int MaxExp { get => maxExp; set => maxExp = value; }
-        public int UnSpendSkillpoint { get => unspendSkillpoint; set => unspendSkillpoint = value; }
-
-        #endregion
-
-        #region Constructor
-        public Player()
+        #region Construktor
+        public Player(String name, List<Texture2D> playerTexture, int width, int height)
         {
-            
+            base.Name = name;
+            //base.Texture = playerTexture;
+            textureList = playerTexture;
+            base.Texture = textureList.FirstOrDefault();
+
+            //Debugging
+            base.T_class = "Knight";
+            base.Strength = 1;
+            base.Intelligence = 1;
+            base.Dexterity = 1;
+            base.StrengthMod = 1;
+            base.IntelligenceMod = 1;
+            base.DexterityMod = 1;
+            base.ArmorClass = 1;
+            base.HealthPoints = 100;
+            base.ManaPoints = 100;
+            //base.BoundingBox = new Rectangle();
+            base.Speed = 4f;
+
+            this.width = width;
+            this.height = height;
+            base.BoundingBox = new Rectangle((int)base.PlayerPositionX + (width/2),(int) base.PlayerPositionY + (height/3*2), width, height);
         }
         #endregion
 
         #region Methods
-
-        public void addExp(int exp)
-        {   //if abfrage für maxexp
-            CurrentExp += exp;
-        }
-
-        private void levelUp()
+        public override void moveUp()
         {
-
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                base.PlayerPositionY -= base.Speed;
+            }
         }
-
-        public bool increaseSkill()
+        public override void moveDown()
         {
-            return CurrentExp > MaxExp;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                base.PlayerPositionY += base.Speed;
+            }
         }
+        public override void moveLeft()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                base.PlayerPositionX -= base.Speed;
+            }
+        }
+        public override void moveRight()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                base.PlayerPositionX += base.Speed;
+            }
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            base.BoundingBoxX = (int) base.PlayerPositionX;
+            base.BoundingBoxY = (int) base.PlayerPositionY;
+
+            //Update der Animation
+            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastFrame > millisecondsPerFrame)
+            {
+                timeSinceLastFrame -= millisecondsPerFrame;
+                base.Texture = textureList.ElementAt(nextTexture);
+                nextTexture++;
+                if (nextTexture >= textureList.Count)
+                {
+                    nextTexture = 0;
+                }
+            }
+            
+
+        }
+
+        //Getter and Setter
+        public new Texture2D Texture { get => base.Texture; set => base.Texture = value; }
+        public new Vector2 PlayerPosition { get => base.PlayerPosition; set => base.PlayerPosition = value; }
         #endregion
-
-        
+        public new Rectangle BoundingBox { get => base.BoundingBox; }
     }
 }

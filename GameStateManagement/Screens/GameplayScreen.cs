@@ -1,368 +1,290 @@
-#region File Description
-
-//-----------------------------------------------------------------------------
-// GameplayScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-
-#endregion File Description
-
-#region Using Statements
-
-using GameStateManagement.Class;
+ï»¿using GameStateManagement.Class;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Threading;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-#endregion Using Statements
-
-namespace GameStateManagement
+namespace GameStateManagement.Screens
 {
-    /// <summary>
-    /// This screen implements the actual game logic. It is just a
-    /// placeholder to get the idea across: you'll probably want to
-    /// put some more interesting gameplay in here!
-    /// </summary>
     internal class GameplayScreen : GameScreen
     {
         #region Fields
-
         private ContentManager Content;
-
-        #endregion Fields
+        private SpriteFont gameFont;
+        #endregion
 
         #region Variablen
-        private SpriteBatch _spriteBatch;
-
-        // player
         private Player player;
 
-        //enemy
-        private Enemy enemy;
+        //World
+        private Texture2D worldTexture;
+        private int singleTextureResolution = 16;
+        private List<TileEntry> tileMap;
+        private Tile wall_left_01;
+        private Tile wall_top_01;
+        private Tile wall_right_01;
+        private Tile wall_bottom_01;
+        private Tile wall_corner_left;
+        private Tile wall_corner_right;
+        private Tile door_left_1;
+        private Tile door_right_1;
+        private Tile ground_1;
+        private int targetTextureResolution = 64;
 
-        //controller
-        private Controller controller;     
+        private String[,] map = new String[,] { {"wl","wt","wt","dl","dr","wt","wt","wr"},
+                                                {"wl","g","g","g","g","g","g","wr"},
+                                                {"wl","g","g","g","g","g","g","wr"},
+                                                {"wl","g","g","g","g","g","g","wr"},
+                                                {"wl","g","g","g","g","g","g","wr"},
+                                                {"wl","g","wb","g","g","wb","g","wr"},
+                                                {"wl","g","g","g","g","g","g","wr"},
+                                                {"cl","wb","wb","wb","wb","wb","wb","cr"}};
 
-        // Font
-        private SpriteFont spriteFont;
+        private List<Rectangle> collisionObjects;
+        private Vector2 oldPlayerPosition;
 
-        // Viewport
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+        private SpriteFont _spriteFont;
         private Viewport viewport;
 
-        // Sprites
-        //private Texture2D ShipTexture;
-        private Texture2D StarTexture;
-
-        // Laser Variablen
-        private List<Vector2> laserShots = new List<Vector2>();       
-
-        // Spieler-Punkte und Zeichenposition der Punkte
-        private int playerScore;
-        private Vector2 scorePosition;
-
-        //Kollision
-        private Rectangle safeBounds;
-        private const float SafeAreaPortion = 0.05f;
-
-        #endregion Variablen
+        private KeyboardState currentKeyboardState;
+        private KeyboardState previousKeyboardState;
+        #endregion
 
         #region Initialization
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public GameplayScreen()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
         }
 
-        /// <summary>
-        /// Load graphics content for the game.
-        /// </summary>
         public override void LoadContent()
         {
-            if (Content == null)
-                Content = new ContentManager(ScreenManager.Game.Services, "Content");
-            
+            if(Content == null)
+            {
+                Content = new ContentManager(ScreenManager.Game.Services, "Content") ;
+            }
+
             if(player == null)
             {
-                player = new Player(Content.Load<Texture2D>("ship"), Content.Load<Texture2D>("laser"), Content.Load<SoundEffect>("laserfire"));
+                //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight\knight_f_idle_anim_f0"));
+                //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight2\Protect"));
+                List<Texture2D> playerTextures = new List<Texture2D>();
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f0"));
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f1"));
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f2"));
+                playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f3"));
+                player = new Player("Spieler", playerTextures,64,112);
             }
 
-            if (enemy == null)
-            {
-                enemy = new Enemy(Content.Load<Texture2D>("enemy"), Content.Load<SoundEffect>("explosion"));
-            }
-
-            if(controller == null)
-            {
-                controller = new Controller();
-            }
-
-            // Ein SpriteBatch zum Zeichnen
             _spriteBatch = new SpriteBatch(ScreenManager.GraphicsDevice);
 
-            // Viewport speichern
             viewport = ScreenManager.GraphicsDevice.Viewport;
 
-            //Kollider initialisieren
-            safeBounds = new Rectangle(
-                (int)(viewport.Width * SafeAreaPortion),
-                (int)(viewport.Height * SafeAreaPortion),
-                (int)(viewport.Width * (1 - 2 * SafeAreaPortion)),
-                (int)(viewport.Height * (1 - 2 * SafeAreaPortion)));
+            player.PlayerPosition = new Vector2((map.GetLength(0)/2)*targetTextureResolution,(map.GetLength(1)/2)*targetTextureResolution);
 
-            // Texturen laden
-            StarTexture = Content.Load<Texture2D>("starfield");
+            //TESTING
+            worldTexture = Content.Load<Texture2D>(@"Test\Dungeon_Tileset");
+            tileMap = new List<TileEntry>();
 
-            // Font laden
-            spriteFont = Content.Load<SpriteFont>("Verdana");
+            //worldTexture, resolution of single texture in texture map, coordinates of texture in texturemap
+            wall_left_01 = new Tile(worldTexture, singleTextureResolution, new Vector2(0,0),true);
+            wall_top_01 = new Tile(worldTexture, singleTextureResolution, new Vector2(16,0),true);
+            wall_right_01 = new Tile(worldTexture, singleTextureResolution, new Vector2(80,0),true);
+            wall_bottom_01 = new Tile(worldTexture, singleTextureResolution, new Vector2(16, 64),true);
+            wall_corner_left = new Tile(worldTexture, singleTextureResolution, new Vector2(0,64), true);
+            wall_corner_right = new Tile(worldTexture, singleTextureResolution, new Vector2(80,64), true);
+            door_left_1 = new Tile(worldTexture, singleTextureResolution, new Vector2(96,48), true);
+            door_right_1 = new Tile(worldTexture, singleTextureResolution, new Vector2(112,48), true);
+            ground_1 = new Tile(worldTexture, singleTextureResolution, new Vector2(16, 16), false);
 
-            //Sound lautstärke
-            SoundEffect.MasterVolume = 0.025f;
+            for (int x = 0; x < map.GetLength(0); x++)
+            {
+                for (int y = 0; y < map.GetLength(1); y++)
+                {
+                    float newTileXCoord = y * targetTextureResolution;
+                    float newTileYCoord = x * targetTextureResolution;
+                    Vector2 newTileCoordinates = new Vector2(newTileXCoord, newTileYCoord);
 
-            // Das Raumschiff positionieren
-            player.setShipPosition(new Vector2(viewport.Width/2, viewport.Height - 100));
+                    if (map[x, y] == "wl")
+                    {
+                        tileMap.Add(new TileEntry(wall_left_01, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "wb")
+                    {
+                        tileMap.Add(new TileEntry(wall_bottom_01, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "cl")
+                    {
+                        tileMap.Add(new TileEntry(wall_corner_left, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "cr")
+                    {
+                        tileMap.Add(new TileEntry(wall_corner_right, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "dl")
+                    {
+                        tileMap.Add(new TileEntry(door_left_1, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "dr")
+                    {
+                        tileMap.Add(new TileEntry(door_right_1, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "g")
+                    {
+                        tileMap.Add(new TileEntry(ground_1, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "wt")
+                    {
+                        tileMap.Add(new TileEntry(wall_top_01, newTileCoordinates));
+                    }
+                    else if (map[x, y] == "wr")
+                    {
+                        tileMap.Add(new TileEntry(wall_right_01, newTileCoordinates));
+                    }
+                }
+            }
 
-            // Radius der Feinde festlegen
-            enemy.calcRadius();
-
-            // Position der Score Ausgabe festlegen
-            scorePosition = new Vector2(25, 25);
+            collisionObjects = new List<Rectangle>();
+            foreach(TileEntry tileEntry in tileMap)
+            {
+                if (tileEntry.Tile.HasCollision)
+                {
+                    collisionObjects.Add(new Rectangle((int)tileEntry.DrawVector.X, (int) tileEntry.DrawVector.Y, 64, 1));
+                }
+            }
 
         }
 
-        /// <summary>
-        /// Unload graphics content used by the game.
-        /// </summary>
         public override void UnloadContent()
         {
             Content.Unload();
         }
-
-        #endregion Initialization
+        #endregion
 
         #region Update and Draw
-
-        /// <summary>
-        /// Updates the state of the game. This method checks the GameScreen.IsActive
-        /// property, so the game will stop updating when the pause menu is active,
-        /// or if you tab away to a different application.
-        /// </summary>
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                       bool coveredByOtherScreen)
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-            //CurrentKeyboardState
-            controller.setCurrentKeyboardState(Keyboard.GetState());
+            currentKeyboardState = Keyboard.GetState();
 
-            // Prevent the person from moving off of the screen
-            player.setShipPosition(new Vector2(MathHelper.Clamp(player.getShipPosition().X, safeBounds.Left, safeBounds.Right - player.getShipTexture().Width), player.getShipPosition().Y));
+            //Testing
+            /*tileMap.Add(new TileEntry(wall_left_01, new Vector2(0, 0)));
+            tileMap.Add(new TileEntry(wall_top_01, new Vector2(128, 0)));
+            tileMap.Add(new TileEntry(wall_right_01, new Vector2(256, 0)));
+            tileMap.Add(new TileEntry(wall_bottom_01, new Vector2(0, 128)));*/
 
-            // Space
-            if (controller.IsNewKeyPressed(Keys.Space))
-            {
-                player.FireLaser(laserShots);
-            }
-
-            controller.setPreviousKeyboardState(controller.getCurrentKeyboardState());
             
-            //Enemy pause 
-            if (!otherScreenHasFocus)
+
+            player.Update(gameTime);
+            foreach(Rectangle rect in collisionObjects)
             {
-                enemy.UpdateEnemies();
+                if (rect.Intersects(player.BoundingBox))
+                {
+                    player.PlayerPosition = oldPlayerPosition;
+                }
             }
-            
-            UpdateLaserShots();
+            /*Rectangle testRectangle = new Rectangle(0,0,64,64);
+            if (testRectangle.Intersects(player.BoundingBox))
+            {
+                player.PlayerPositionX += 30;
+            }*/
+
+            oldPlayerPosition = player.PlayerPosition;
 
             base.Update(gameTime, otherScreenHasFocus, false);
         }
 
-        /// <summary>
-        /// Lets the game respond to player input. Unlike the Update method,
-        /// this will only be called when the gameplay screen is active.
-        /// </summary>
         public override void HandleInput(InputState input)
         {
-            if (input == null)
+            if(input == null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            // Look up inputs for the active player profile.
             int playerIndex = (int)ControllingPlayer.Value;
 
             KeyboardState keyboardState = input.CurrentKeyboardStates[playerIndex];
-            GamePadState gamePadState = input.CurrentGamePadStates[playerIndex];
 
-            // The game pauses either if the user presses the pause button, or if
-            // they unplug the active gamepad. This requires us to keep track of
-            // whether a gamepad was ever plugged in, because we don't want to pause
-            // on PC if they are playing with a keyboard and have no gamepad at all!
-            bool gamePadDisconnected = !gamePadState.IsConnected &&
-                                       input.GamePadWasConnected[playerIndex];
-
-            if (input.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
+            if(input.IsPauseGame(ControllingPlayer))
             {
                 ScreenManager.AddScreen(new PauseMenuScreen(), ControllingPlayer);
             }
             else
             {
-                // Otherwise move the player position.
-                // player movement
+                Vector2 movement = Vector2.Zero;
+
                 if (keyboardState.IsKeyDown(Keys.Left))
                 {
-                    player.MoveShipLeft();
+                    player.moveLeft();
                 }
-
                 if (keyboardState.IsKeyDown(Keys.Right))
                 {
-                    player.MoveShipRight();
+                    player.moveRight();
+                }
+                if (keyboardState.IsKeyDown(Keys.Up))
+                {
+                    player.moveUp();
+                }
+                if (keyboardState.IsKeyDown(Keys.Down))
+                {
+                    player.moveDown();
                 }
             }
         }
 
-        /// <summary>
-        /// Draws the gameplay screen.
-        /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            ScreenManager.GraphicsDevice.Clear(Color.CornflowerBlue);
+            ScreenManager.GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin();
+            //_spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
-            // Hintergrund zeichnen
             DrawBackground();
 
-            // Das Schiff zeichnen
-            DrawSpaceShip();
+            DrawLevel();
+            
+            DrawPlayer();
 
-            // Laser zeichnen
-            DrawLaser();
-
-            // Feinde zeichnen
-            DrawEnemy();
-
-            // Punkte anzeigen
-            DrawScore();
+            DrawOverlay();
 
             _spriteBatch.End();
 
             base.Draw(gameTime);
         }
-
-        #endregion Update and Draw
-               
-        #region Update von Lasern und Gegnern
-
-        public void UpdateLaserShots()
-        {
-            int laserIndex = 0;
-
-            while (laserIndex < laserShots.Count)
-            {
-                // hat der Schuss den Bildschirm verlassen?
-                if (laserShots[laserIndex].Y < 0)
-                {
-                    laserShots.RemoveAt(laserIndex);
-                }
-                else
-                {
-                    // Position des Schusses aktualiesieren
-                    Vector2 pos = laserShots[laserIndex];
-                    //pos.Y -= laserSpeed;
-                    pos.Y -= player.getLaserSpeed();
-                    laserShots[laserIndex] = pos;
-
-                    // Überprüfen ob ein Treffer vorliegt
-                    int enemyIndex = 0;
-
-                    while (enemyIndex < enemy.getEnemyPositions().Count)
-                    {
-                        // Abstand zwischen Feind-Position und Schuss-Position ermitteln
-                        float distance = Vector2.Distance(enemy.getEnemyPositions()[enemyIndex], laserShots[laserIndex]);
-
-                        // Treffer?
-                        if (distance < enemy.getEnemyRadius())
-                        {
-                            // Schuss entfernen
-                            laserShots.RemoveAt(laserIndex);
-                            // Feind entfernen
-                            enemy.getEnemyPositions().RemoveAt(enemyIndex);
-                            // Punkte erhöhen
-                            playerScore++;
-
-                            enemy.PlayExplosionSound();
-
-                            // Schleife verlassen
-                            break;
-                        }
-                        else
-                        {
-                            enemyIndex++;
-                        }
-                    }
-                    laserIndex++;
-                }
-            }
-        }
-
         #endregion
 
-        #region methods
-     
+        #region Methods
         private void DrawBackground()
         {
-            // TODO
-            // Die Sternenfeld Grafik an der Position 0,0 zeichnen
-            _spriteBatch.Draw(StarTexture, new Vector2(0, 0), Color.White);
+
         }
 
-        private void DrawSpaceShip()
+        private void DrawLevel()
         {
-            // TODO
-            // Das Schiff mittig an den Koordinaten des Schiffes (shipPosition) zeichnen 
-            //_spriteBatch.Draw(ShipTexture, shipPosition, Color.White);
-            _spriteBatch.Draw(player.getShipTexture(), player.getShipPosition(), Color.White);
-        }
-
-        private void DrawLaser()
-        {
-            // TODO
-            // Die Liste mit den Laser-Schüssen (laserShots) durchlaufen
-            // und alle Schüsse (LaserTexture) zeichnen
-            foreach (Vector2 laser in laserShots)
+            //_spriteBatch.Draw(test,new Rectangle(0,0, 64,64),new Rectangle(0,0,16,16), Color.White);
+            foreach(TileEntry tileEntry in tileMap)
             {
-                //_spriteBatch.Draw(LaserTexture, laser, Color.Green);
-                _spriteBatch.Draw(player.getLaserTexture(), laser, Color.Green);
+                _spriteBatch.Draw(tileEntry.Tile.Texture, new Rectangle((int)tileEntry.DrawVector.X, (int)tileEntry.DrawVector.Y, targetTextureResolution, targetTextureResolution), new Rectangle((int)tileEntry.Tile.TextureVector.X, (int) tileEntry.Tile.TextureVector.Y, tileEntry.Tile.TextureResolution, tileEntry.Tile.TextureResolution),Color.White);
             }
         }
 
-        private void DrawEnemy()
+        private void DrawPlayer()
         {
-            // TODO
-            // Die Liste mit allen Gegnern (enemyPositions) durchlaufen
-            // und alle Feinde (EnemyTexture) zeichnen
-            foreach (Vector2 enemypos in enemy.getEnemyPositions())
-            {
-                _spriteBatch.Draw(enemy.getEnemyTexture(), enemypos, enemy.getEnemyColor());
-            }
+            _spriteBatch.Draw(player.Texture, new Rectangle((int) player.PlayerPositionX, (int) player.PlayerPositionY,64,112), Color.White);
+            //_spriteBatch.Draw(player.Texture, new Rectangle((int)player.PlayerPositionX, (int)player.PlayerPositionY, 64,112), Color.White);
         }
 
-        private void DrawScore()
+        private void DrawOverlay()
         {
-            // TODO
-            // Die Punkte (playerScore) oben links (scorePosition) anzeigen
-            _spriteBatch.DrawString(spriteFont, "Highscore: " + playerScore, scorePosition, Color.White);
+
         }
-        #endregion methods
+        #endregion
     }
 }
