@@ -30,22 +30,6 @@ namespace GameStateManagement.Class
         private float speed;
         private Texture2D texture;
         private Vector2 playerPosition;
-
-        #region Properties
-        public string Name { get => name; set => name = value; }
-        public String Klasse { get => klasse; set => klasse = value; }
-        public int Strength { get => strength; set => strength = value; }
-        public int Intelligence { get => intelligence; set => intelligence = value; }
-        public int Dexterity { get => dexterity; set => dexterity = value; }
-        public int Constitution { get => constitution; set => constitution = value; }
-        public int Armor { get => armouryClass; set => armouryClass = value; }
-        public int StrengthMod { get => strMod; set => strMod = value; }
-        public int IntelligenceMod { get => intMod; set => intMod = value; }
-        public int DexterityMod { get => dexMod; set => dexMod = value; }
-        public int ConstitutionMod { get => conMod; set => conMod = value; }
-        public int HealthPoints { get => healthPoints; set => healthPoints = value; }
-        public int ManaPoints { get => manaPoints; set => manaPoints = value; }
-
         #endregion
 
         #region Constructor

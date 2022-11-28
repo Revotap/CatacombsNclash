@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace GameStateManagement.Class
 {
-    public class Enemy : Character
+    internal class Enemy : Character
     {
         #region Variables
         private Item loot;
@@ -43,6 +43,26 @@ namespace GameStateManagement.Class
         public int ExpGrant()
         {
             return Exp;
+        }
+
+        public override void moveUp()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void moveDown()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void moveLeft()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void moveRight()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
