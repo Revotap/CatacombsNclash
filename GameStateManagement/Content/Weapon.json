@@ -1,0 +1,61 @@
+{
+ "Breitschwert" :{
+    "damage": "8",
+    "Message": " slayed 100 emoji",
+    "StunDuration": "0",
+    "FireDuration": "0",
+    "PoisonDuration": "0",
+    "rarity": "common"
+
+  },
+  "Phyrexianischer Stab": {
+    "damage": "6",
+    "Message": " get Yawgmothed",
+    "StunDuration": "0",
+    "FireDuration": "0",
+    "PoisonDuration": "10",
+    "rarity": "mythic"
+
+  },
+  "Zauberstab": {
+    "damage": "6",
+    "Message": " bonk",
+    "StunDuration": "0",
+    "FireDuration": "0",
+    "PoisonDuration": "0",
+    "rarity": "uncommon"
+  },
+  "Bogen der Nylea": {
+    "damage": "8",
+    "Message": " pew pew pew",
+    "StunDuration": "0",
+    "FireDuration": "0",
+    "PoisonDuration": "3",
+    "rarity": "rare"
+  },
+  "Bogen": {
+    "damage": "6",
+    "Message": " pew pew",
+    "StunDuration": "0",
+    "FireDuration": "0",
+    "PoisonDuration": "0",
+    "rarity": "uncommon"
+  },
+  "Loxodon Klinge": {
+    "damage": "6",
+    "Message": " törö",
+    "StunDuration": "3",
+    "FireDuration": "0",
+    "PoisonDuration": "0",
+    "rarity": "rare"
+  },
+
+  "Dolch der 1000 Worte": {
+    "damage": "4",
+    "Message": "...",
+    "StunDuration": "0",
+    "FireDuration": "0",
+    "PoisonDuration": "0",
+    "rarity": "mythic"
+  }
+}

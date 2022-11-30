@@ -37,6 +37,18 @@ namespace GameStateManagement.Screens
         private Tile ground_1;
         private int targetTextureResolution = 64;
 
+
+        /*
+         wl =
+         wt =
+         g = 
+         cl = 
+         wb = 
+         wr =
+         cr = 
+         
+         */
+
         private String[,] map = new String[,] { {"wl","wt","wt","dl","dr","wt","wt","wr"},
                                                 {"wl","g","g","g","g","g","g","wr"},
                                                 {"wl","g","g","g","g","g","g","wr"},

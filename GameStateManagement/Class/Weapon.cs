@@ -9,6 +9,15 @@ namespace CatacombsNClash.Class
     public class Weapon : Item
     {
         #region Variables
+        public int damage;
+        public String Message;
+        public int StunDuration;
+        public int FreezeDuration;
+        public int FireDuration;
+        public int PoisonDuration;
+        public String rarity;
+
+
 
         #endregion
 
