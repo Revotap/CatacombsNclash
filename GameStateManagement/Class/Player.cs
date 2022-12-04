@@ -97,8 +97,6 @@ namespace GameStateManagement.Class
                     nextTexture = 0;
                 }
             }
-            
-
         }
 
         //Getter and Setter

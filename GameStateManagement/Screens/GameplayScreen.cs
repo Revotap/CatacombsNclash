@@ -21,6 +21,7 @@ namespace GameStateManagement.Screens
 
         #region Variablen
         private Player player;
+        private Enemy enemy;
 
         //World
         private Texture2D worldTexture;
@@ -48,6 +49,7 @@ namespace GameStateManagement.Screens
 
         private List<Rectangle> collisionObjects;
         private Vector2 oldPlayerPosition;
+        private Vector2 oldEnemyPosition;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -83,12 +85,24 @@ namespace GameStateManagement.Screens
                 playerTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f3"));
                 player = new Player("Spieler", playerTextures,64,112);
             }
+            if(enemy == null)
+            {
+                //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight\knight_f_idle_anim_f0"));
+                //player = new Player("Spieler", Content.Load<Texture2D>(@"OurContent\Player\Knight2\Protect"));
+                List<Texture2D> enemyTextures = new List<Texture2D>();
+                enemyTextures.Add(Content.Load<Texture2D>(@"enemy"));
+                enemyTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f1"));
+                enemyTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f2"));
+                enemyTextures.Add(Content.Load<Texture2D>(@"Test\knight_f_idle_anim_f3"));
+                enemy = new Enemy("Spieler", enemyTextures, 64,112);
+            }
 
             _spriteBatch = new SpriteBatch(ScreenManager.GraphicsDevice);
 
             viewport = ScreenManager.GraphicsDevice.Viewport;
 
             player.PlayerPosition = new Vector2((map.GetLength(0)/2)*targetTextureResolution,(map.GetLength(1)/2)*targetTextureResolution);
+            enemy.EnemyPosition = new Vector2((map.GetLength(0)/2)*targetTextureResolution,(map.GetLength(1)/2)*targetTextureResolution);
 
             //TESTING
             worldTexture = Content.Load<Texture2D>(@"Test\Dungeon_Tileset");
@@ -190,6 +204,14 @@ namespace GameStateManagement.Screens
                     player.PlayerPosition = oldPlayerPosition;
                 }
             }
+            enemy.Update(gameTime);
+            foreach(Rectangle rect in collisionObjects)
+            {
+                if (rect.Intersects(enemy.BoundingBox))
+                {
+                    enemy.EnemyPosition = oldEnemyPosition;
+                }
+            }
             /*Rectangle testRectangle = new Rectangle(0,0,64,64);
             if (testRectangle.Intersects(player.BoundingBox))
             {
@@ -197,6 +219,7 @@ namespace GameStateManagement.Screens
             }*/
 
             oldPlayerPosition = player.PlayerPosition;
+            oldEnemyPosition = enemy.EnemyPosition;
 
             base.Update(gameTime, otherScreenHasFocus, false);
         }
@@ -235,6 +258,21 @@ namespace GameStateManagement.Screens
                 if (keyboardState.IsKeyDown(Keys.Down))
                 {
                     player.moveDown();
+                }  if (keyboardState.IsKeyDown(Keys.Left))
+                {
+                    enemy.moveLeft();
+                }
+                if (keyboardState.IsKeyDown(Keys.Right))
+                {
+                    enemy.moveRight();
+                }
+                if (keyboardState.IsKeyDown(Keys.Up))
+                {
+                    enemy.moveUp();
+                }
+                if (keyboardState.IsKeyDown(Keys.Down))
+                {
+                    enemy.moveDown();
                 }
             }
         }
@@ -251,6 +289,8 @@ namespace GameStateManagement.Screens
             DrawLevel();
             
             DrawPlayer();
+
+            DrawEnemy();
 
             DrawOverlay();
 
@@ -278,6 +318,11 @@ namespace GameStateManagement.Screens
         private void DrawPlayer()
         {
             _spriteBatch.Draw(player.Texture, new Rectangle((int) player.PlayerPositionX, (int) player.PlayerPositionY,64,112), Color.White);
+            //_spriteBatch.Draw(player.Texture, new Rectangle((int)player.PlayerPositionX, (int)player.PlayerPositionY, 64,112), Color.White);
+        }
+        private void DrawEnemy()
+        {
+            _spriteBatch.Draw(enemy.Texture, new Rectangle((int) enemy.EnemyPositionX, (int) enemy.EnemyPositionY,64,112), Color.White);
             //_spriteBatch.Draw(player.Texture, new Rectangle((int)player.PlayerPositionX, (int)player.PlayerPositionY, 64,112), Color.White);
         }
 

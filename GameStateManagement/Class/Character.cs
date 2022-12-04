@@ -30,6 +30,7 @@ namespace GameStateManagement.Class
         private float speed;
         private Texture2D texture;
         private Vector2 playerPosition;
+        private Vector2 enemyPosition;
         #endregion
 
         #region Constructor
@@ -65,8 +66,11 @@ namespace GameStateManagement.Class
         protected float Speed { get => speed; set => speed = value; }
         protected Texture2D Texture { get => texture; set => texture = value; }
         public Vector2 PlayerPosition { get => playerPosition; set => playerPosition = value; }
+        public Vector2 EnemyPosition { get => enemyPosition; set => enemyPosition = value; }
         public float PlayerPositionX { get => playerPosition.X; set => playerPosition.X = value; }
+        public float EnemyPositionX { get => enemyPosition.X; set => enemyPosition.X = value; }
         public float PlayerPositionY { get => playerPosition.Y; set => playerPosition.Y = value; }
+        public float EnemyPositionY { get => enemyPosition.Y; set => enemyPosition.Y = value; }
         #endregion
 
     }
